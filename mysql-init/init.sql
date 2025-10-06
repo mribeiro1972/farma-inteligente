@@ -1,0 +1,9 @@
+CREATE DATABASE IF NOT EXISTS esp32_data;
+USE esp32_data;
+
+CREATE TABLE IF NOT EXISTS sensor_readings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    temperature FLOAT NOT NULL,
+    humidity FLOAT NOT NULL,
+    reading_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

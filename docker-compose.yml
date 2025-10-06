@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: esp32-mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: esp32_data
+      TZ: "America/Porto_Velho"  # Fuso horário de Porto Velho (UTC-4)
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - esp32-network
+
+  web:
+    build: ./php
+    container_name: esp32-web
+    depends_on:
+      - mysql
+    ports:
+      - "80:80"  # Ou "8080:80" se mudou
+    volumes:
+      - ./php:/var/www/html
+    networks:
+      - esp32-network
+    command: >
+      sh -c "sleep 10 && apache2-foreground"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: esp32-phpmyadmin
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ""
+    networks:
+      - esp32-network
+
+networks:
+  esp32-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+
